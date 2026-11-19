@@ -46,5 +46,6 @@ Run in the browser and manager you use, logged in to x.com.
 | --- | --- | --- | --- |
 | 2026-11-19 | 1.0.0 | Brave (Chromium 158), Violentmonkey, Windows 10, logged in | Detection and sizing correct on 4 posts; font `error` (CSP `font-src` blocked `data:`) |
 | 2026-11-19 | 1.0.1 | Same | Font `loaded`, 4 of 4 verse posts marked at 22.5px/42.75px; first verse fits 1 line versus 2 in Segoe UI |
+| 2026-11-19 | 1.0.2 | Same, reinstalled from the public raw URL | One instance running (1 style, 1 font face), font `loaded`, 5 of 5 verse posts marked at 22.5px/42.75px |
 
 Not yet checked live: the Home timeline, "Show more" expansion, Tampermonkey, and browsers other than Brave.

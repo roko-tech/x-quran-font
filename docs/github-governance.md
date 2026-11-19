@@ -23,12 +23,14 @@ Replace `.github/CODEOWNERS` with real accountable owners. Code ownership improv
 
 | Control | State | Evidence |
 | --- | --- | --- |
-| Visibility, merge, labels, Actions, Dependabot | Match the baseline | `python scripts/github_settings.py` reports "GitHub settings match the baseline." |
-| CI | Not running | Every job is refused with: "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings". The same steps pass locally on Windows (Node 22, Python 3.12) and on Linux under WSL (Node 18, Python 3.10). |
-| Branch ruleset | Not imported | Import waits for a first green CI run. A ruleset that requires checks that cannot run would block every merge to `main`. Import it once billing is fixed and CI passes. |
-| Secret scanning and push protection | Unavailable | `PATCH /repos/roko-tech/x-quran-font` returned HTTP 422: "Secret scanning is not available for this repository." |
+| Visibility | Public, by the owner's decision, so installed copies can auto-update | `python scripts/github_settings.py` reports one deliberate difference: "private: expected True, found False" |
+| Merge, labels, Actions, Dependabot | Match the baseline | Same check, no other differences |
+| CI | Runs and passes | Private, the jobs were refused for organization Actions billing. Public repositories get free Actions minutes, and run 44520362949 on `95d18a6` passed on Ubuntu and Windows |
+| Branch ruleset | `.github/rulesets/main.json` imported after the first green run | `gh api repos/roko-tech/x-quran-font/rulesets` |
+| Secret scanning and push protection | Enabled | Private, GitHub returned HTTP 422; enabled after the visibility change |
+| Private vulnerability reporting | Enabled | `GET .../private-vulnerability-reporting` returns `{"enabled":true}` |
 
-Until the ruleset is active, `main` is unprotected. The single maintainer pushes to it directly after running the local checks.
+With the ruleset active, every change to `main` goes through a pull request with both CI checks passing. That includes the maintainer's own changes.
 
 ## Default-branch rules
 

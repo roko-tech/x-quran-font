@@ -47,9 +47,9 @@ This checklist was completed in the first commit, on 2026-11-19. Keep it as the 
 
 - [x] `.github/CODEOWNERS` confirmed (@rokogan).
 - [x] `python scripts/github_settings.py --apply` run and read back as matching the baseline. Topics: arabic, fonts, quran, twitter, userscript, violentmonkey.
-- [ ] Branch ruleset: not imported, because CI is blocked by the organization's Actions billing and has never passed. Details in [docs/github-governance.md](docs/github-governance.md).
-- [ ] Required checks and conversation resolution: depend on the ruleset above.
-- [x] Dependabot alerts and security fixes enabled by the settings script. Secret scanning was attempted and GitHub returned HTTP 422, "not available for this repository".
+- [x] Branch ruleset imported from `.github/rulesets/main.json` after the first green CI run. Details in [docs/github-governance.md](docs/github-governance.md).
+- [x] Required checks (Ubuntu and Windows) and conversation resolution come from the ruleset.
+- [x] Dependabot alerts and security fixes enabled. Secret scanning, push protection and private vulnerability reporting enabled once the repository went public; private, GitHub returned HTTP 422.
 - [x] Actions: read-only token, GitHub-owned actions only, pinned to full SHAs.
 - [ ] AI review: not connected.
 
@@ -63,7 +63,7 @@ This checklist was completed in the first commit, on 2026-11-19. Keep it as the 
 ## 9. Prove readiness
 
 - [x] All documented commands run from this checkout.
-- [ ] CI on Ubuntu and Windows: blocked by Actions billing (jobs not started). The same steps pass locally on Windows and under WSL Ubuntu.
+- [x] CI on Ubuntu and Windows passes. It was blocked by Actions billing while the repository was private.
 - [x] Primary workflow exercised in Brave with Violentmonkey, logged in.
 - [x] Limitations and untested surfaces listed in the [user guide](docs/user/README.md) and [testing](docs/testing.md).
 - [ ] Release checklist: not applicable until a public release.
