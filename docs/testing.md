@@ -10,7 +10,7 @@ python -m unittest discover -s tests -v
 git diff --check
 ```
 
-CI runs the same commands on Ubuntu and Windows.
+CI runs all of them except `git diff --check` on Ubuntu and Windows. That check only makes sense on uncommitted changes, so run it locally before committing.
 
 [`tests/x-quran-font.test.cjs`](../tests/x-quran-font.test.cjs) runs the real script in a Node `vm` sandbox, with stand-ins for `document`, `FontFace`, `MutationObserver`, `requestAnimationFrame` and `GM_getResourceURL`. It proves:
 

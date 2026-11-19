@@ -37,7 +37,7 @@ flowchart LR
 | --- | --- | --- | --- | --- |
 | Malicious post text | Crafted text in a post | Script misbehaves or injects markup | Text is only read via `textContent` and matched by bounded character-class regexes; nothing is written back except an attribute | Low |
 | Tampered font file | Compromised CDN or package | Malformed font reaches the browser's font parser | Exact version pin (`@fontsource/scheherazade-new@5.3.0`); fetched once at install; browsers sanitize web fonts | Low; accepted |
-| Tampered script update | Someone edits the installed copy or the repository | Arbitrary code on a logged-in x.com | Private repository; manual install only; no `@updateURL` | Low |
+| Tampered script update | Someone edits the repository, or the manager fetches an "update" from where the script was installed | Arbitrary code on a logged-in x.com | Private repository; no `@updateURL`. Violentmonkey may still check the URL it installed from, so install by dragging the file in, or untick **Allow update** in the script's settings | Low |
 | Data exfiltration | A future edit adds network calls | Account or post data leaks | The script has no network calls, and only `GM_getResourceURL` is granted. Review rule in [AGENTS.md](../../AGENTS.md) | Low |
 | Performance abuse | A huge page or flood of mutations | Page jank | At most one scan per animation frame; linear regex tests | Low |
 | Dependency or CI compromise | Mutable action | Bad CI result | Actions pinned to full SHAs; read-only token | Low |
