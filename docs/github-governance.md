@@ -24,7 +24,7 @@ Replace `.github/CODEOWNERS` with real accountable owners. Code ownership improv
 | Control | State | Evidence |
 | --- | --- | --- |
 | Visibility, merge, labels, Actions, Dependabot | Match the baseline | `python scripts/github_settings.py` reports "GitHub settings match the baseline." |
-| CI | Not running | Every job is refused with: "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings". The same steps pass locally on Windows (Node 22, Python 3.13) and on Linux under WSL (Node 18, Python 3.10). |
+| CI | Not running | Every job is refused with: "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings". The same steps pass locally on Windows (Node 22, Python 3.12) and on Linux under WSL (Node 18, Python 3.10). |
 | Branch ruleset | Not imported | Import waits for a first green CI run. A ruleset that requires checks that cannot run would block every merge to `main`. Import it once billing is fixed and CI passes. |
 | Secret scanning and push protection | Unavailable | `PATCH /repos/roko-tech/x-quran-font` returned HTTP 422: "Secret scanning is not available for this repository." |
 
