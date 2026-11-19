@@ -1,76 +1,41 @@
 # Architecture overview
 
-- Status: Starter baseline; replace project-specific placeholders before the first production feature.
-- Owner: Technical owner
-- Last reviewed: 2026-08-20
+- Status: Current (v1.0.1)
+- Owner: @rokogan
+- Last reviewed: 2026-11-19
 
-## Default architecture
+## Shape
 
-Start with a modular monolith: one deployable application with explicit internal modules, plus only the external infrastructure the first user journey actually requires. This reduces distributed-system coordination while preserving boundaries that can be extracted later if measured scale, isolation, deployment cadence, or ownership demands it.
-
-Suggested dependency direction:
-
-```text
-Interfaces (HTTP, CLI, UI, jobs)
-        -> Application use cases
-        -> Domain rules
-        -> Ports owned by the application/domain
-
-Infrastructure adapters (database, queues, vendors)
-        -> Implement those ports
-```
-
-Domain and application logic must not depend on a web framework, database client, or vendor SDK unless the project records a deliberate exception. Modules own their invariants and data access; cross-module interaction uses explicit APIs or events rather than reaching into another module's tables or internals.
-
-## System context
-
-Replace this generic C4-style view with real people, systems, trust boundaries, and data classes.
+One file, [`x-quran-font.user.js`](../../x-quran-font.user.js), run by a userscript manager on x.com and twitter.com at `document-start`. There is no server, no build, no stored state and no runtime dependency. [ADR-0001](decisions/0001-default-to-a-modular-monolith.md) applies only trivially: there is one module.
 
 ```mermaid
 flowchart LR
-    User[Primary user] -->|Uses| Product[Product under development]
-    Operator[Operator] -->|Operates| Product
-    Product -->|Minimum required integration| External[External system]
-    Product -->|Stores approved state| Data[(Primary data store)]
+    User[Reader in Brave] --> X[x.com page]
+    Manager[Violentmonkey] -->|injects| Script[x-quran-font.user.js]
+    Manager -->|install time: @resource| CDN[jsDelivr: Fontsource Scheherazade New 5.3.0]
+    Script -->|reads post text, sets data-quran-font| X
+    Script -->|FontFace from bytes| Fonts[document.fonts]
 ```
 
-## Containers and runtime
+## Flow
 
-```mermaid
-flowchart TB
-    Client[User interface or client] --> App[Modular application]
-    App --> Store[(Owned data store)]
-    App --> Provider[External provider adapter]
-    Scheduler[Optional scheduler] --> App
-    App --> Telemetry[Logs, metrics, traces]
-```
+1. **Font.** `GM_getResourceURL('quranFont', false)` returns the font the manager cached at install, as a `data:` URL. The script decodes it to bytes and adds `new FontFace('X Quran Font', bytes)` to `document.fonts`. No URL is fetched, so X's CSP does not apply. See [ADR-0002](decisions/0002-load-the-font-from-its-bytes.md).
+2. **Style.** One `<style>` rule targets `[data-testid="tweetText"][data-quran-font]` and sets the font, `1.5rem` size and `1.9` line height. Descendant spans inherit them.
+3. **Detection.** A `MutationObserver` on the whole document (child lists and text) queues at most one scan per animation frame. Each scan re-tests every post text and toggles `data-quran-font`. Re-testing on every scan keeps the mark right when X re-renders or swaps text.
 
-For each real container, document its responsibility, owner, technology, deployment unit, inputs/outputs, data classification, scaling limit, and failure behavior.
+State lives in a `data-*` attribute because X rewrites `class` on re-render.
 
-## Module map
+## External contracts the script relies on
 
-| Module | Responsibility | Owns data | May depend on | Public contract |
-| --- | --- | --- | --- | --- |
-| Define during setup | One cohesive business capability | Define | Define | Define |
+| Contract | Owner | If it changes |
+| --- | --- | --- |
+| `data-testid="tweetText"` on post text | X | Nothing matches; X's normal look returns |
+| Root font size equals X's base text size | X | Size scales differently; adjust `FONT_SIZE` |
+| `GM_getResourceURL(name, false)` returns a `data:` URL | Violentmonkey and Tampermonkey | Font decoding fails; posts still enlarge |
+| Pinned Fontsource 5.3.0 file on jsDelivr | jsDelivr/npm (immutable versions) | Install fails to fetch the font |
 
-Rules:
+## Data
 
-- Keep business invariants with the module that owns them.
-- Validate untrusted data at the boundary and convert it to explicit internal types.
-- Make transactions and consistency expectations visible.
-- Hide vendor-specific behavior behind narrow adapters when switching, testing, or failure isolation has real value.
-- Prefer synchronous calls inside the process. Introduce queues/events only for a defined durability, latency, load, or decoupling requirement.
+The script reads post text in the page and writes only the `data-quran-font` attribute and one style element. It stores and sends nothing. See the [threat model](../security/threat-model.md).
 
-## Data and contracts
-
-Document schemas, ownership, classification, retention, deletion, migrations, idempotency, compatibility, and backup requirements. Public APIs and durable event formats are versioned contracts. Database migrations must be forward-safe and have a rollback or roll-forward strategy.
-
-## Reliability and observability
-
-Define timeouts, retries with bounds/jitter, idempotency, backpressure, graceful degradation, and dependency failure behavior at real boundaries. Instrument user journeys and service-level indicators, not only host health. Logs must be structured, actionable, and free of unapproved sensitive data.
-
-## When to split a service
-
-Require evidence for at least one durable need: independent scaling, fault/security isolation, separate data sovereignty, materially different deployment cadence, or stable independent ownership. Record the tradeoff in an ADR, including network failure, observability, deployment, testing, and consistency costs.
-
-Architecture decisions are indexed in [decisions/README.md](decisions/README.md). Proposed cross-cutting designs live in [../design/README.md](../design/README.md).
+Decisions are indexed in [decisions/README.md](decisions/README.md).

@@ -1,53 +1,31 @@
 # Operations runbook
 
-- Status: Template; replace every instruction with tested project commands.
-- Service owner: Define
-- Escalation contact: Define
-- Last rehearsed: Never
+- Status: Current (v1.0.1)
+- Owner: @rokogan
 
-Do not present placeholders as executable instructions in a live service. Each production procedure needs an owner, prerequisites, safe command or UI path, expected output, failure branch, rollback, and last rehearsal date.
+This is a client-side userscript. There is no service, deployment, monitoring or on-call.
 
-## Service summary
+## Release
 
-- User journey served:
-- Environments and URLs:
-- Deployment unit/artifact:
-- Data stores and external dependencies:
-- Dashboards, logs, traces, and alert routes:
-- Current release/version lookup:
+1. Make the change, bump `@version` in `x-quran-font.user.js`, and add a [changelog](../../CHANGELOG.md) entry.
+2. Run the automated commands and the manual live check in [testing.md](../testing.md).
+3. Commit, push to `main`, and confirm CI passes for that commit.
+4. Install the file in Violentmonkey (**Reinstall**).
 
-## Health assessment
+## Roll back
 
-1. Confirm scope: one user, one tenant, one region, or global.
-2. Check user-journey indicators and recent deployments/configuration changes.
-3. Check dependency health, saturation, queue/backlog, and error classes.
-4. Correlate logs/traces using safe identifiers; do not copy sensitive payloads.
-5. Record timestamps, evidence, and uncertainty in the incident channel/ticket.
+Check out the previous version and reinstall it:
 
-## Deploy
+```shell
+git show <previous-commit>:x-quran-font.user.js > x-quran-font.user.js
+```
 
-Define exact preflight checks, immutable artifact identification, migration order, deployment command, smoke test, monitoring window, and completion criteria. Prefer promotion of the artifact already validated by CI.
+Or disable the script in Violentmonkey. X then renders normally.
 
-## Roll back or roll forward
+## Diagnose
 
-Define when rollback is safe, especially after schema or externally visible writes. Name the previous artifact, command, data compatibility requirement, verification, and escalation point. For irreversible data changes, provide a rehearsed roll-forward or restore procedure.
-
-## Common failure playbooks
-
-For each alert or common symptom, add:
-
-- user impact and urgency;
-- likely and dangerous causes;
-- read-only diagnostic steps first;
-- bounded mitigation;
-- validation and rollback;
-- evidence to preserve;
-- owner and follow-up issue.
-
-## Shutdown and restart
-
-Check active requests, jobs, migrations, and external side effects before shutdown. Drain or checkpoint work, preserve idempotency state, restart with known configuration, and verify the primary user journey—not only process health.
-
-## Incident closure
-
-Confirm recovery against service indicators and user behavior, communicate remaining risk, preserve a timeline, and create a postmortem for significant impact using [postmortem-template.md](postmortem-template.md).
+| Symptom | Check |
+| --- | --- |
+| Verses look like before | Is the script enabled for x.com? Does `document.querySelector('[data-testid="tweetText"]')` still match? X may have renamed the attribute. |
+| Bigger but old font | Font status (see [testing.md](../testing.md)). If it is `error`, check the console for a `font-src` violation: X may have changed its CSP or how fonts are handled. |
+| Page feels slow | Profile x.com with the script disabled and then enabled; scans should be at most one per frame. |

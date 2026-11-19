@@ -16,3 +16,4 @@ Do not create ADRs for routine implementation details or easily reversible prefe
 | ADR | Status | Decision |
 | --- | --- | --- |
 | [0001](0001-default-to-a-modular-monolith.md) | Accepted | Default to a modular monolith |
+| [0002](0002-load-the-font-from-its-bytes.md) | Accepted | Load the font from its bytes, not a URL |

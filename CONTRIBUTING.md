@@ -30,12 +30,14 @@ Draft pull requests are welcome for early design feedback. A pull request is mer
 
 ## Local validation
 
-The template baseline is:
+Requires Node.js 22 or later and Python 3.12 or later. There are no dependencies to install.
 
 ```shell
+node --check x-quran-font.user.js
+node --test tests/x-quran-font.test.cjs
 python scripts/verify.py
 python -m unittest discover -s tests -v
 git diff --check
 ```
 
-Projects created from this template must add their stack-specific commands here and in CI.
+Every release also needs the manual live check in [docs/testing.md](docs/testing.md). Bump `@version` with every change to the script.

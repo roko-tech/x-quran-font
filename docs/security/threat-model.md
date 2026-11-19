@@ -1,60 +1,47 @@
 # Threat model
 
-- Status: Starter baseline; complete during project setup and review after every trust-boundary change.
-- Owner: Security owner or technical owner
-- Last reviewed: 2026-08-20
+- Status: Current (v1.0.1)
+- Owner: @rokogan
+- Last reviewed: 2026-11-19
 
-## Scope and security objectives
+## Scope and objectives
 
-Define the system, environments, data, users, operators, dependencies, and workflows covered. State the properties that must hold, such as:
+The userscript runs inside the user's logged-in x.com session with access to everything on the page. It must:
 
-- users can access only resources they are authorized to access;
-- secrets and sensitive data are never committed, exposed to clients, or written to unsafe logs;
-- untrusted input cannot trigger unintended code, queries, network access, file access, or external side effects;
-- important writes are authenticated, authorized, validated, auditable, and recoverable;
-- dependency or CI compromise cannot silently publish an unreviewed artifact.
+- never send page content or account data anywhere;
+- never execute or interpret post text, only test it against fixed regular expressions;
+- load only the pinned font file, through the userscript manager.
 
 ## Assets
 
-| Asset | Sensitivity/value | Owner | Storage/transit | Retention/deletion |
-| --- | --- | --- | --- | --- |
-| User data | Define | Define | Define | Define |
-| Credentials/tokens | Critical | Define | Secret manager only | Rotate/revoke |
-| Source/build/release | High | Define | GitHub and artifact store | Define |
-| Service availability/integrity | High | Define | Runtime | Define |
+| Asset | Sensitivity | Where |
+| --- | --- | --- |
+| The user's X session and page content | High | Browser; the script reads post text only |
+| The installed script | High: it runs on a logged-in site | Userscript manager storage |
+| Source | Low: private repository | GitHub |
 
-## Actors and capabilities
+There are no credentials, stored data, logs or telemetry.
 
-List anonymous users, authenticated roles, administrators, operators, external providers, CI identities, insiders, compromised dependencies, and attackers. For each, define intended permissions and plausible misuse.
-
-## Trust boundaries and data flow
-
-Replace this starter view with real boundaries and label protocols, authentication, and data classes.
+## Trust boundaries
 
 ```mermaid
 flowchart LR
-    Untrusted[Untrusted user/input] --> Boundary[Validated interface]
-    Boundary --> App[Application authorization and rules]
-    App --> Data[(Owned sensitive state)]
-    App --> Vendor[External provider]
-    CI[CI identity] --> Artifact[Release artifact]
-    Operator[Privileged operator] --> App
+    Posts[Post text from other X users: untrusted] -->|textContent, regex test only| Script[Userscript]
+    CDN[jsDelivr font file] -->|install time, via manager| Script
+    Script -->|data-quran-font attribute, style rule| Page[x.com DOM]
 ```
 
 ## Threat register
 
-| Scenario | Preconditions/path | Impact | Existing control | Validation | Residual risk/owner |
-| --- | --- | --- | --- | --- | --- |
-| Identity spoofing/session theft | Define | Unauthorized access | Define | Auth tests | Define |
-| Cross-user/tenant access | Missing object-level authorization | Data disclosure/change | Deny by default | Negative authorization tests | Define |
-| Injection or unsafe parsing | Untrusted input reaches interpreter/query/path | Code/data compromise | Typed parameters and allowlists | Adversarial tests | Define |
-| Server-side request/file access | User controls URL/path | Internal/data access | Scheme/host/path policy | Boundary tests | Define |
-| Secret or private-data leakage | Logs, errors, prompts, artifacts | Confidentiality breach | Redaction/minimization | Log/artifact review | Define |
-| Dependency/CI compromise | Mutable action or excessive token | Source/release compromise | SHA pins and least privilege | Workflow audit | Define |
-| Replay/duplicate side effect | Retry or duplicate delivery | Double charge/write/message | Idempotency keys | Duplicate/restart tests | Define |
-| Resource exhaustion/abuse | Costly unauthenticated operation | Availability/cost | Limits, quotas, backpressure | Load/abuse tests | Define |
-| Destructive admin error | Excess privilege or unsafe operation | Data loss/outage | Approval, dry run, backup | Restore/recovery drill | Define |
+| Scenario | Path | Impact | Control | Residual risk |
+| --- | --- | --- | --- | --- |
+| Malicious post text | Crafted text in a post | Script misbehaves or injects markup | Text is only read via `textContent` and matched by bounded character-class regexes; nothing is written back except an attribute | Low |
+| Tampered font file | Compromised CDN or package | Malformed font reaches the browser's font parser | Exact version pin (`@fontsource/scheherazade-new@5.3.0`); fetched once at install; browsers sanitize web fonts | Low; accepted |
+| Tampered script update | Someone edits the installed copy or the repository | Arbitrary code on a logged-in x.com | Private repository; manual install only; no `@updateURL` | Low |
+| Data exfiltration | A future edit adds network calls | Account or post data leaks | The script has no network calls, and only `GM_getResourceURL` is granted. Review rule in [AGENTS.md](../../AGENTS.md) | Low |
+| Performance abuse | A huge page or flood of mutations | Page jank | At most one scan per animation frame; linear regex tests | Low |
+| Dependency or CI compromise | Mutable action | Bad CI result | Actions pinned to full SHAs; read-only token | Low |
 
 ## Review triggers
 
-Update this model when adding identities/roles, sensitive data, external integrations, file/network processing, AI tools, public endpoints, background jobs, payment or messaging side effects, deployment identities, or a new trust boundary. Link security tests and accepted risk to the implementing pull request or ADR.
+Revisit when adding a `@grant`, network access, storage, a new `@match` site, an `@updateURL`, or a new font source.

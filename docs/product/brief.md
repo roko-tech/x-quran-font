@@ -1,65 +1,59 @@
 # Product brief
 
-- Status: Draft
-- Product owner: Define during setup
-- Technical owner: Define during setup
-- Last reviewed: 2026-08-20
-
-Complete this brief before choosing architecture. Use evidence and measurable outcomes; avoid describing implementation as the problem.
+- Status: Accepted
+- Product owner: @rokogan
+- Technical owner: @rokogan
+- Last reviewed: 2026-11-19
 
 ## Problem
 
-Who experiences the problem, in what context, and what evidence shows it is worth solving?
+When reading X in Brave on Windows, posts that quote the Quran are hard to read. X has no Arabic font, so the text falls back to Segoe UI at 15px with 20px lines. That font mangles Uthmani marks, and the tight lines make stacked diacritics collide. Installing a better font does not help, because Brave hides user-installed fonts from x.com.
 
 ## Users and stakeholders
 
 | Group | Need | Current workaround | Risk if unmet |
 | --- | --- | --- | --- |
-| Primary user | Define | Define | Define |
-| Operator/maintainer | Define | Define | Define |
+| The owner, reading X in Arabic | Read verses in timelines without straining | Open the verse elsewhere, or zoom the page | Verses are skipped or misread |
+| Maintainer (same person) | Change size, spacing or font without re-engineering | None | Fixes break silently when X changes |
 
 ## Proposed outcome
 
-Describe the smallest valuable user outcome in plain language.
+Posts containing Quran text show in a proper Naskh font, larger and with taller lines. All other posts look exactly as X renders them.
 
 ## Success measures
 
-| Measure | Baseline | Target | Measurement window | Owner |
-| --- | --- | --- | --- | --- |
-| Primary outcome | Define | Define | Define | Define |
-| Quality/reliability guardrail | Define | Define | Define | Define |
-
-Prefer outcomes such as task completion, error reduction, latency, recovery, or retained usage. Output counts alone are not proof of value.
+| Measure | Baseline | Target | How measured |
+| --- | --- | --- | --- |
+| Verse posts rendered in the bundled font on x.com | 0% (Segoe UI) | Every post with Uthmani marks on a test profile | Manual check in [testing.md](../testing.md) |
+| Ordinary posts unchanged | n/a | No restyling of plain or lightly vocalised Arabic, or of English | Unit tests plus a timeline look |
 
 ## Scope
 
 ### In scope
 
-- Define the first end-to-end user journey.
+- Post text on x.com and twitter.com, in timelines and on post pages.
+- Uthmani text and fully vocalised text in ordinary spelling.
 
 ### Non-goals
 
-- State tempting adjacent work that this project will not solve now.
+- Restyling all Arabic on X.
+- Direct messages, the composer, translations or profile bios.
+- A settings UI. Constants are edited in the script.
+- Publishing to userscript directories.
 
 ## Constraints and assumptions
 
-- Legal, privacy, security, accessibility, budget, schedule, platform, integration, and data constraints.
-- Assumptions that could invalidate the solution and how they will be tested.
+- X's logged-in CSP blocks fonts loaded from any URL, `data:` and `blob:` included ([ADR-0002](../architecture/decisions/0002-load-the-font-from-its-bytes.md)).
+- Brave Shields hides user-installed fonts on x.com.
+- X marks post text with `data-testid="tweetText"`. If X renames it, the script stops matching and X's normal styling returns.
 
 ## Primary journey and acceptance
 
-Write a concrete scenario:
+> Given the script is installed and the user is logged in to x.com, when they open a timeline or profile with Quran posts, then those posts render in Scheherazade New at 1.5× size and 1.9 line height, and the font reports `loaded`.
 
-> Given a defined starting state, when the user performs an action, then they observe a measurable result.
-
-List failure and recovery cases, not only the happy path.
-
-## Risks and unknowns
-
-| Risk or unknown | Likelihood | Impact | Validation or mitigation | Owner |
-| --- | --- | --- | --- | --- |
-| Define | Define | Define | Define | Define |
+Failure case: if the font cannot load, posts are still enlarged with taller lines, but in X's normal font.
 
 ## Delivery slices
 
-Name the smallest vertical slice that proves the architecture and user outcome. Defer capabilities that are not required for that proof.
+1. Done: detection, font from bytes, styling (v1.0.1).
+2. Possible next: detect short verses in ordinary spelling, and auto-update if the repository becomes public.

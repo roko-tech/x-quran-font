@@ -1,56 +1,50 @@
-# Testing strategy
+# Testing
 
-Tests are evidence about risk, not a score to maximize. Map each acceptance criterion and important failure mode to the cheapest reliable test, then add real-boundary or live evidence where isolation hides material behavior.
-
-## Quality layers
-
-| Layer | Proves | Typical use | Does not prove alone |
-| --- | --- | --- | --- |
-| Static checks | Syntax, style, types, known patterns | Every change | Runtime behavior |
-| Unit/component | Business rules and local states | Dense edge-case coverage | Real adapters or deployment |
-| Integration/contract | Boundaries, schemas, protocols, persistence | Database/provider/module seams | Complete user journey |
-| End-to-end | Primary journey across real components | Critical outcomes and regressions | Every edge case or production scale |
-| Platform/package | Built/installed artifact on supported targets | Installers, permissions, codecs, OS behavior | Production data/integration health |
-| Live smoke/recovery | Actual environment, credentials, dependencies, rollback/restore | Release and operational confidence | Broad deterministic regression coverage |
-
-## Required practices
-
-- Derive tests from acceptance criteria, invariants, past defects, threat scenarios, and operating risks.
-- For a bug, add a reproduction that fails before the fix when practical.
-- Test observable behavior rather than private implementation details.
-- Keep deterministic tests isolated and fast, but do not let mocks define an external contract. Add contract or integration tests against a realistic boundary.
-- Test failure, timeout, retry, duplicate, cancellation, partial-write, and recovery paths where they matter.
-- Keep test data minimal, synthetic, non-sensitive, deterministic, and versioned.
-- Do not lower assertions, skip tests, or regenerate expected output without reviewing the semantic change.
-- Treat coverage as a gap-finding signal. A percentage is not evidence that important behavior is correct.
-
-## Change-risk matrix
-
-| Change | Expected evidence |
-| --- | --- |
-| Pure domain rule | Unit tests for examples, boundaries, invalid states, and invariants |
-| Database/schema | Migration test on realistic prior state, compatibility, rollback/roll-forward, backup impact |
-| External API | Contract fixtures plus sandbox/live smoke where allowed; timeout/rate-limit/error behavior |
-| UI/workflow | Component tests plus browser/user journey, accessibility, loading/empty/error states, screenshots when visual |
-| Authentication/authorization | Positive and negative tests for every role/tenant/resource boundary |
-| Concurrency/job processing | Idempotency, duplicate delivery, race, crash/restart, ordering, and retry exhaustion |
-| Packaging/platform | Clean install/build and primary workflow on each supported target |
-| AI behavior | Versioned eval set, adversarial cases, structured-output validation, abstention/fallback, cost/latency bounds |
-
-## Commands
-
-The template currently validates its own repository contract:
+## Automated
 
 ```shell
+node --check x-quran-font.user.js
+node --test tests/x-quran-font.test.cjs
 python scripts/verify.py
 python -m unittest discover -s tests -v
 git diff --check
 ```
 
-During setup, add exact commands for formatting, linting, typing, unit, integration, end-to-end, build/package, dependency/security, migration, platform, and live smoke checks. CI and local documentation must invoke the same underlying commands.
+CI runs the same commands on Ubuntu and Windows.
 
-## Evidence in pull requests
+[`tests/x-quran-font.test.cjs`](../tests/x-quran-font.test.cjs) runs the real script in a Node `vm` sandbox, with stand-ins for `document`, `FontFace`, `MutationObserver`, `requestAnimationFrame` and `GM_getResourceURL`. It proves:
 
-Record the exact command, environment, result, and relevant artifact or screenshot. Say what was not run and why. A green hermetic suite must not be described as proof of installation, live integrations, backup restoration, media/player behavior, production scale, or another surface it did not exercise.
+- the font is requested with `GM_getResourceURL('quranFont', false)` and registered from bytes, and the stylesheet contains no `@font-face` or `url(`;
+- which posts are marked: Uthmani, Quranic sukun only, pause mark only and fully vocalised verses are marked; plain Arabic, light tashkeel, a short vocalised phrase and English are not;
+- posts that load later are marked, and a post whose text is swapped in place is re-evaluated in both directions;
+- many mutations trigger only one scan per frame.
 
-Flaky tests are defects: quarantine only with an owner, tracking issue, reason, and expiry. Never silently retry until red becomes green.
+It does not prove rendering, X's real DOM, the CSP, or the manager's resource handling.
+
+Test text is public Quran verses and invented ordinary sentences. Do not copy real users' posts into tests.
+
+## Manual live check (required for every release)
+
+Run in the browser and manager you use, logged in to x.com.
+
+1. Install the build in Violentmonkey and reload x.com.
+2. Open the profile of an account that posts Uthmani verses. Do not scroll the Home timeline, which could change other scripts' state.
+3. In DevTools on that tab, run:
+
+   ```js
+   [...document.fonts].filter(f => f.family === 'X Quran Font').map(f => f.status)
+   ```
+
+   Expect `["loaded"]`.
+
+4. Check one verse post: computed `font-size` should be `22.5px` and `line-height` `42.75px`. Look at it: the marks should be clear and not touch the line above.
+5. Open a post with ordinary Arabic and check that it looks unchanged.
+
+### Results
+
+| Date | Version | Environment | Result |
+| --- | --- | --- | --- |
+| 2026-11-19 | 1.0.0 | Brave (Chromium 158), Violentmonkey, Windows 10, logged in | Detection and sizing correct on 4 posts; font `error` (CSP `font-src` blocked `data:`) |
+| 2026-11-19 | 1.0.1 | Same | Font `loaded`, 4 of 4 verse posts marked at 22.5px/42.75px; first verse fits 1 line versus 2 in Segoe UI |
+
+Not yet checked live: the Home timeline, "Show more" expansion, Tampermonkey, and browsers other than Brave.

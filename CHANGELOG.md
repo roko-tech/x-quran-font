@@ -1,20 +1,16 @@
 # Changelog
 
-All notable changes to this project are documented here. Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and use semantic versioning when the project exposes a versioned public contract.
+All notable changes are documented here, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions match the userscript's `@version`.
 
-## [Unreleased]
-
-### Added
-
-- Initial project governance, documentation, AI instructions, GitHub workflows, and repository validation.
-- `scripts/github_settings.py` to check or apply the repository, label, Actions, and Dependabot baseline.
-
-### Changed
-
-- CI cancels superseded runs only for pull requests, so every commit pushed to `main` keeps its own result.
-- The no-AI-co-author-trailer rule now covers every AI tool, not only Codex.
+## [1.0.1] - 2026-11-19
 
 ### Fixed
 
-- `scripts/verify.py` skips files ignored by `.gitignore`, such as dependencies and build or scratch output.
-- `scripts/verify.py` no longer requires the default ADR-0001 filename, and `PROJECT_SETUP.md` no longer says the file may be removed.
+- The font now loads when you are logged in to x.com. X's logged-in CSP blocks `data:` fonts, so the font is registered with `FontFace` from its bytes instead of `@font-face` ([ADR-0002](docs/architecture/decisions/0002-load-the-font-from-its-bytes.md)).
+
+## [1.0.0] - 2026-11-19
+
+### Added
+
+- Posts containing Quran text, either Uthmani marks or full vocalisation, are shown in Scheherazade New at 1.5× size with 1.9 line height. Other posts are unchanged.
+- The font is bundled through `@resource`, because Brave hides installed fonts from x.com.

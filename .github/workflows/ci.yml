@@ -33,6 +33,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Check userscript syntax
+        run: node --check x-quran-font.user.js
+
+      - name: Run userscript tests
+        run: node --test tests/x-quran-font.test.cjs
+
       - name: Validate repository contract
         run: python scripts/verify.py
 

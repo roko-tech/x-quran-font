@@ -32,15 +32,23 @@ Do not infer behavior from filenames or comments when code, tests, logs, persist
 
 ## Verification
 
-Run the narrowest relevant checks during development and the full affected suite before handoff. The starter's baseline commands are:
+The stack is a single plain-JavaScript userscript with no dependencies and no build. Run all of these before handoff (Node.js 22 or later, Python 3.12 or later):
 
 ```shell
+node --check x-quran-font.user.js
+node --test tests/x-quran-font.test.cjs
 python scripts/verify.py
 python -m unittest discover -s tests -v
 git diff --check
 ```
 
-After the application stack is selected, replace this section with the exact formatter, linter, type checker, unit, integration, end-to-end, build, package, and platform commands. Report commands run, results, and untested surfaces. Do not claim that mocked or hermetic tests prove live integrations, installation, deployment, migration, backup restoration, or user-visible behavior.
+The Node tests run the script in a sandbox. They do not prove rendering, X's real DOM, X's CSP or the userscript manager. Any change to the script needs the manual live check in `docs/testing.md`, logged in to x.com, with its result recorded there. Report commands run, results, and untested surfaces.
+
+Repository-specific facts that are easy to get wrong:
+
+- Brave hides user-installed fonts from x.com, and X's logged-in CSP blocks font URLs, `data:` and `blob:` included. Fonts must be registered with `FontFace` from bytes (ADR-0002). A logged-out `curl` of x.com shows a laxer CSP; do not trust it.
+- Some editing tools turn backslash-u escapes into raw characters when writing files. Keep the regexes in `x-quran-font.user.js` as ASCII escapes, and check after editing that the file is ASCII-only.
+- Bump `@version` with every change to the script.
 
 ## Safety and authority
 
@@ -51,6 +59,10 @@ After the application stack is selected, replace this section with the exact for
 
 ## Code Review Rules
 
+- Flag any network access, new `@grant`, storage, `@updateURL`/`@downloadURL`, or new `@match` site. The script runs inside a logged-in x.com session and must not send or store anything (see `docs/security/threat-model.md`).
+- Flag any font loaded through a URL (`@font-face`, `url(`, `blob:`). X's CSP blocks it; use `FontFace` from bytes.
+- Flag detection changes that would restyle ordinary Arabic posts, or anything that writes to post content beyond the `data-quran-font` attribute.
+- Flag work done per mutation instead of per animation frame. X mutates the DOM constantly.
 - Flag behavior that violates acceptance criteria, public contracts, authorization boundaries, data ownership, migration safety, idempotency, or rollback guarantees. State the concrete failure path and the safer path.
 - Treat missing tests as consequential when they leave a changed business rule, trust boundary, failure mode, or regression unproved. Do not request coverage for its own sake.
 - Flag documentation only when stale guidance could cause incorrect operation, unsafe maintenance, or a wrong user expectation. Leave deterministic formatting and lint checks to CI.
