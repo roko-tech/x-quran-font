@@ -14,7 +14,7 @@ This checklist was completed in the first commit, on 2026-11-19. Keep it as the 
 - [x] Consequential choice recorded: [ADR-0002](docs/architecture/decisions/0002-load-the-font-from-its-bytes.md), how the font is loaded.
 - [x] Minimum skeleton: `x-quran-font.user.js`.
 - [x] `.editorconfig` (4-space JS) and `.env.example` (no configuration) updated. `.gitignore` already covers Node.
-- [ ] License: deferred. The repository is private and not distributed. Choose one before making it public.
+- [x] License: MIT, matching the owner's other userscripts. Added when the repository was made public.
 
 ## 3. Make commands truthful
 

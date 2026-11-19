@@ -59,7 +59,8 @@ Repository-specific facts that are easy to get wrong:
 
 ## Code Review Rules
 
-- Flag any network access, new `@grant`, storage, `@updateURL`/`@downloadURL`, or new `@match` site. The script runs inside a logged-in x.com session and must not send or store anything (see `docs/security/threat-model.md`).
+- Flag any network access, new `@grant`, storage, change to `@updateURL`/`@downloadURL`, or new `@match` site. The script runs inside a logged-in x.com session and must not send or store anything (see `docs/security/threat-model.md`).
+- Every push to `main` reaches all installed copies through auto-update. Flag a script change without an `@version` bump, and anything on `main` that is not ready to ship.
 - Flag any font loaded through a URL (`@font-face`, `url(`, `blob:`). X's CSP blocks it; use `FontFace` from bytes.
 - Flag detection changes that would restyle ordinary Arabic posts, or anything that writes to post content beyond the `data-quran-font` attribute.
 - Flag work done per mutation instead of per animation frame. X mutates the DOM constantly.

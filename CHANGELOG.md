@@ -2,6 +2,13 @@
 
 All notable changes are documented here, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions match the userscript's `@version`.
 
+## [1.0.2] - 2026-11-19
+
+### Added
+
+- Auto-update from the public repository (`@updateURL`/`@downloadURL`), plus `@homepageURL`, `@supportURL`, `@author` and `@license`. Copies installed before 1.0.2 need one reinstall from the raw link to pick these up.
+- MIT license.
+
 ## [1.0.1] - 2026-11-19
 
 ### Fixed

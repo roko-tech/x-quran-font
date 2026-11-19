@@ -55,5 +55,5 @@ Failure case: if the font cannot load, posts are still enlarged with taller line
 
 ## Delivery slices
 
-1. Done: detection, font from bytes, styling (v1.0.1).
-2. Possible next: detect short verses in ordinary spelling, and auto-update if the repository becomes public.
+1. Done: detection, font from bytes, styling (v1.0.1). Public repository with auto-update (v1.0.2).
+2. Possible next: detect short verses in ordinary spelling.

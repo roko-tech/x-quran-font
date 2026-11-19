@@ -1,8 +1,14 @@
 // ==UserScript==
 // @name         X Quran Font
 // @namespace    https://github.com/roko-tech
-// @version      1.0.1
+// @version      1.0.2
 // @description  Shows posts with Quran verses on X in a Naskh font, larger and with taller lines, so the diacritics are readable.
+// @author       roko-tech
+// @license      MIT
+// @homepageURL  https://github.com/roko-tech/x-quran-font
+// @supportURL   https://github.com/roko-tech/x-quran-font/issues
+// @updateURL    https://raw.githubusercontent.com/roko-tech/x-quran-font/main/x-quran-font.user.js
+// @downloadURL  https://raw.githubusercontent.com/roko-tech/x-quran-font/main/x-quran-font.user.js
 // @match        https://x.com/*
 // @match        https://twitter.com/*
 // @resource     quranFont https://cdn.jsdelivr.net/npm/@fontsource/scheherazade-new@5.3.0/files/scheherazade-new-arabic-400-normal.woff2

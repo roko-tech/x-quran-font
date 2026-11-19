@@ -14,11 +14,11 @@ A userscript that makes Quran verses on X (Twitter) readable. Posts containing Q
 
 Requires Violentmonkey (or Tampermonkey) in a Chromium browser.
 
-1. Open [`x-quran-font.user.js`](x-quran-font.user.js) from a local clone. Drag it into a browser tab, or serve the folder locally and open the file's URL.
+1. Open **[x-quran-font.user.js (raw)](https://raw.githubusercontent.com/roko-tech/x-quran-font/main/x-quran-font.user.js)**.
 2. Click **Install** on the userscript manager's page.
 3. Reload x.com.
 
-The manager downloads the font (about 80 KB) once, at install time.
+The manager downloads the font (about 80 KB) once, at install time. Updates arrive automatically from this repository's `main` branch.
 
 Details, settings and troubleshooting: [user guide](docs/user/README.md).
 
@@ -45,4 +45,4 @@ Changes: bump `@version`, add a [changelog](CHANGELOG.md) entry, and repeat the 
 
 ## License
 
-None yet. The repository is private. Choose a license before publishing it. The font is not stored in this repository; Scheherazade New (SIL Open Font License) is fetched from jsDelivr when the script is installed.
+[MIT](LICENSE). The font is not stored in this repository: Scheherazade New (SIL Open Font License) is fetched from jsDelivr when the script is installed.

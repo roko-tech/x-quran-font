@@ -1,6 +1,6 @@
 # Architecture overview
 
-- Status: Current (v1.0.1)
+- Status: Current (v1.0.2)
 - Owner: @rokogan
 - Last reviewed: 2026-11-19
 
@@ -13,6 +13,7 @@ flowchart LR
     User[Reader in Brave] --> X[x.com page]
     Manager[Violentmonkey] -->|injects| Script[x-quran-font.user.js]
     Manager -->|install time: @resource| CDN[jsDelivr: Fontsource Scheherazade New 5.3.0]
+    Manager -->|update checks: @updateURL| Raw[GitHub raw main]
     Script -->|reads post text, sets data-quran-font| X
     Script -->|FontFace from bytes| Fonts[document.fonts]
 ```
@@ -33,6 +34,7 @@ State lives in a `data-*` attribute because X rewrites `class` on re-render.
 | Root font size equals X's base text size | X | Size scales differently; adjust `FONT_SIZE` |
 | `GM_getResourceURL(name, false)` returns a `data:` URL | Violentmonkey and Tampermonkey | Font decoding fails; posts still enlarge |
 | Pinned Fontsource 5.3.0 file on jsDelivr | jsDelivr/npm (immutable versions) | Install fails to fetch the font |
+| `raw.githubusercontent.com/roko-tech/x-quran-font/main/x-quran-font.user.js` | This repository | Installed copies stop receiving updates |
 
 ## Data
 

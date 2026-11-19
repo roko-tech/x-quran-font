@@ -3,11 +3,12 @@
 ## Install
 
 1. Install [Violentmonkey](https://violentmonkey.github.io/) (or Tampermonkey) in Brave or Chrome.
-2. Open `x-quran-font.user.js` in the browser: drag the file into a tab, or serve this folder locally (for example `python -m http.server 8000 --bind 127.0.0.1`) and open `http://127.0.0.1:8000/x-quran-font.user.js`.
-3. Click **Install**. The manager downloads the font once, about 80 KB, from jsDelivr.
-4. Reload x.com. Posts with Quran verses now appear larger, in Scheherazade New.
+2. Open the [raw script](https://raw.githubusercontent.com/roko-tech/x-quran-font/main/x-quran-font.user.js) and click **Install**. The manager downloads the font once, about 80 KB, from jsDelivr.
+3. Reload x.com. Posts with Quran verses now appear larger, in Scheherazade New.
 
-Update: open the new file the same way and click **Reinstall**. Because the repository is private, automatic updates are not set up.
+Updates: the manager checks the same raw URL and installs any version with a higher `@version`. If you installed before v1.0.2, reinstall once from the link above to pick up the update URL.
+
+If you edit the script yourself, a later update will overwrite your edits. Turn off **Allow update** in the script's settings to keep them.
 
 ## Which posts change
 
@@ -44,7 +45,7 @@ After changing `@resource`, reinstall the script so the manager downloads the ne
 
 ## Privacy
 
-The script reads post text only in your browser and sends nothing anywhere. The only network request is the userscript manager downloading the font from jsDelivr at install time.
+The script reads post text only in your browser and sends nothing anywhere. The only network requests come from the userscript manager: downloading the font from jsDelivr at install time, and checking GitHub for script updates.
 
 ## Known limitations
 
